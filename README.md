@@ -4,8 +4,14 @@ Sometimes VMWare Fusion says it cannot find your Boot Camp partition, even thoug
 
 Using this script should let you create a Boot Camp VM.
 
+## Requirements
+
+- VMWare Fusion
+- An existing Boot Camp install
+
 ## Instructions
 
 1. [Download this repository](https://github.com/mikew/vmware-fusion-bootcamp/archive/master.zip)
-2. Run `fusion-make-bootcamp` in a terminal
-3. There should now be a Boot Camp VM on your desktop
+2. Extract `vmware-fusion-bootcamp-master.zip`
+3. Run `fusion-make-bootcamp` in a terminal
+4. There should now be a Boot Camp VM on your desktop
