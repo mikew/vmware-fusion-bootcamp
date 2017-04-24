@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
+die () {
+    echo "$1"
+    exit 1
+}
+
+generate-vmx-contents () {
+    cat <<-EOF
+.encoding = "UTF-8"
+config.version = "8"
+virtualHW.version = "12"
+scsi0.present = "TRUE"
+scsi0.virtualDev = "lsisas1068"
+sata0.present = "TRUE"
+memsize = "2048"
+mem.hotadd = "TRUE"
+scsi0:0.present = "TRUE"
+scsi0:0.fileName = "Boot Camp.vmdk"
+scsi:0.deviceType = "rawDisk"
+firmware = "efi"
+sata0:1.present = "TRUE"
+sata0:1.autodetect = "TRUE"
+sata0:1.deviceType = "cdrom-raw"
+sata0:1.startConnected = "FALSE"
+ethernet0.present = "TRUE"
+ethernet0.connectionType = "nat"
+ethernet0.virtualDev = "e1000e"
+ethernet0.wakeOnPcktRcv = "FALSE"
+ethernet0.addressType = "generated"
+ethernet0.linkStatePropagation.enable = "TRUE"
+usb.present = "TRUE"
+ehci.present = "TRUE"
+ehci.pciSlotNumber = "0"
+usb_xhci.present = "TRUE"
+sound.present = "TRUE"
+sound.virtualDev = "hdaudio"
+sound.fileName = "-1"
+sound.autodetect = "TRUE"
+mks.enable3d = "TRUE"
+svga.graphicsMemoryKB = "1048576"
+serial0.present = "TRUE"
+serial0.fileType = "thinprint"
+pciBridge0.present = "TRUE"
+pciBridge4.present = "TRUE"
+pciBridge4.virtualDev = "pcieRootPort"
+pciBridge4.functions = "8"
+pciBridge5.present = "TRUE"
+pciBridge5.virtualDev = "pcieRootPort"
+pciBridge5.functions = "8"
+pciBridge6.present = "TRUE"
+pciBridge6.virtualDev = "pcieRootPort"
+pciBridge6.functions = "8"
+pciBridge7.present = "TRUE"
+pciBridge7.virtualDev = "pcieRootPort"
+pciBridge7.functions = "8"
+vmci0.present = "TRUE"
+hpet0.present = "TRUE"
+usb.vbluetooth.startConnected = "TRUE"
+sensor.accelerometer = "pass-through"
+sensor.ambientLight = "pass-through"
+sensor.compass = "pass-through"
+sensor.gyrometer = "pass-through"
+sensor.inclinometer = "pass-through"
+sensor.location = "pass-through"
+sensor.orientation = "pass-through"
+tools.syncTime = "TRUE"
+displayName = "Boot Camp"
+guestOS = "windows9-64"
+nvram = "Boot Camp.nvram"
+virtualHW.productCompatibility = "hosted"
+tools.upgrade.policy = "upgradeAtPowerCycle"
+powerType.powerOff = "soft"
+powerType.powerOn = "soft"
+powerType.suspend = "soft"
+powerType.reset = "soft"
+extendedConfigFile = "Boot Camp.vmxf"
+floppy0.present = "FALSE"
+ehci:0.parent = "-1"
+ehci:0.port = "0"
+ehci:0.deviceType = "video"
+ehci:0.present = "TRUE"
+EOF
+}
+
+diskutil_output=$(diskutil list /dev/disk0)
+vmdir=$(mktemp -d ~/Desktop/Boot\ Camp.XXXXXX)
+efi_id=$(echo "${diskutil_output}" | grep EFI | awk '{ print $1 }' | tr -d ':')
+bootcamp_id=$(echo "${diskutil_output}" | grep BOOTCAMP | awk '{ print $1 }' | tr -d ':')
+
+[ -z "${efi_id}" ] && die "Could not find EFI partition"
+[ -z "${bootcamp_id}" ] && die "Could not find Boot Camp partition"
+
+echo "Unmounting Boot Camp partition ..."
+diskutil unmount "/dev/${bootcamp_name}" || true
+
+(
+    cd "${vmdir}"
+    echo "Creating Boot Camp.vmdk ..."
+    /Applications/VMware\ Fusion.app/Contents/Library/vmware-rawdiskCreator create /dev/disk0 "${efi_id}","${bootcamp_id}" Boot\ Camp ide
+    generate-vmx-contents > Boot\ Camp.vmx
+)
+
+mv "${vmdir}" "${vmdir}.vmwarevm"
+echo "Now open and configure ${vmdir}.vmwarevm"
