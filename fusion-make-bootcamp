@@ -94,7 +94,7 @@ bootcamp_id=$(echo "${diskutil_output}" | grep BOOTCAMP | awk '{ print $1 }' | t
 [ -z "${bootcamp_id}" ] && die "Could not find Boot Camp partition"
 
 echo "Unmounting Boot Camp partition ..."
-diskutil unmount "/dev/${bootcamp_name}" || true
+diskutil unmount "/dev/disk0s${bootcamp_id}" || true
 
 (
     cd "${vmdir}"
