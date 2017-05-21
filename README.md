@@ -14,4 +14,11 @@ Using this script should let you create a Boot Camp VM.
 1. [Download this repository](https://github.com/mikew/vmware-fusion-bootcamp/archive/master.zip)
 2. Extract `vmware-fusion-bootcamp-master.zip`
 3. Run `fusion-make-bootcamp` in a terminal
+
+    > Note if your Boot Camp partition is not on your internal drive you can pass the disk as the first argument to this script:
+
+    ```bash
+    fusion-make-bootcamp /dev/disk1
+    ```
+
 4. There should now be a Boot Camp VM on your desktop

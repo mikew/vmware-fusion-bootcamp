@@ -85,7 +85,8 @@ ehci:0.present = "TRUE"
 EOF
 }
 
-diskutil_output=$(diskutil list /dev/disk0)
+target_disk=${1:-/dev/disk0}
+diskutil_output=$(diskutil list "${target_disk}")
 vmdir=$(mktemp -d ~/Desktop/Boot\ Camp.XXXXXX)
 efi_id=$(echo "${diskutil_output}" | grep EFI | awk '{ print $1 }' | tr -d ':')
 bootcamp_id=$(echo "${diskutil_output}" | grep BOOTCAMP | awk '{ print $1 }' | tr -d ':')
@@ -94,12 +95,12 @@ bootcamp_id=$(echo "${diskutil_output}" | grep BOOTCAMP | awk '{ print $1 }' | t
 [ -z "${bootcamp_id}" ] && die "Could not find Boot Camp partition"
 
 echo "Unmounting Boot Camp partition ..."
-diskutil unmount "/dev/disk0s${bootcamp_id}" || true
+diskutil unmount "${target_disk}s${bootcamp_id}" || true
 
 (
     cd "${vmdir}"
     echo "Creating Boot Camp.vmdk ..."
-    /Applications/VMware\ Fusion.app/Contents/Library/vmware-rawdiskCreator create /dev/disk0 "${efi_id}","${bootcamp_id}" Boot\ Camp ide
+    /Applications/VMware\ Fusion.app/Contents/Library/vmware-rawdiskCreator create "${target_disk}" "${efi_id}","${bootcamp_id}" Boot\ Camp ide
     generate-vmx-contents > Boot\ Camp.vmx
 )
 
