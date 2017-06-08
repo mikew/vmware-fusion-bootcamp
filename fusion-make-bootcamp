@@ -81,6 +81,7 @@ ehci:0.parent = "-1"
 ehci:0.port = "0"
 ehci:0.deviceType = "video"
 ehci:0.present = "TRUE"
+suspend.disabled = "TRUE"
 EOF
 }
 
