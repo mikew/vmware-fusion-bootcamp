@@ -22,3 +22,8 @@ Using this script should let you create a Boot Camp VM.
     ```
 
 4. There should now be a Boot Camp VM on your desktop
+
+## BitLocker
+
+If you enable BitLocker after creating the VM, Fusion might say it can't find it anymore. 
+Just run the script again.
