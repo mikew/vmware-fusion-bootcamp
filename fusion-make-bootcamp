@@ -88,9 +88,9 @@ EOF
 target_disk=${1:-/dev/disk0}
 diskutil_output=$(diskutil list "${target_disk}")
 vmdir=$(mktemp -d ~/Desktop/Boot\ Camp.XXXXXX)
-efi_id=$(echo "${diskutil_output}" | grep EFI | awk '{ print $1 }' | tr -d ':')
-bootcamp_id=$(echo "${diskutil_output}" | grep BOOTCAMP | awk '{ print $1 }' | tr -d ':')
-[ -z "${bootcamp_id}" ] && bootcamp_id=$(echo "${diskutil_output}" | grep 'Microsoft Basic Data' | awk '{ print $1 }' | tr -d ':')
+efi_id=$(echo "${diskutil_output}" | grep -m1 EFI | awk '{ print $1 }' | tr -d ':')
+bootcamp_id=$(echo "${diskutil_output}" | grep -m1 BOOTCAMP | awk '{ print $1 }' | tr -d ':')
+[ -z "${bootcamp_id}" ] && bootcamp_id=$(echo "${diskutil_output}" | grep -m1 'Microsoft Basic Data' | awk '{ print $1 }' | tr -d ':')
 
 [ -z "${efi_id}" ] && die "Could not find EFI partition"
 [ -z "${bootcamp_id}" ] && die "Could not find Boot Camp partition"
